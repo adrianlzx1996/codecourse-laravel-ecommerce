@@ -9,7 +9,7 @@ class HomeController extends Controller
 {
 	public function __invoke()
 	{
-		$categories = Category::get();
+		$categories = Category::tree()->get()->toTree();
 
 		return view('home', [
 			'categories' => $categories
