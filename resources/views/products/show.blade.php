@@ -11,7 +11,7 @@
                         <div>
                             <h1>{{ $product->title }}</h1>
                             <h1 class="font-semibold text-xl mt-2">
-                                {{ $product->price }}
+                                {{ $product->formattedPrice() }}
                             </h1>
 
                             <p class="mt-2 text-gray-500">
