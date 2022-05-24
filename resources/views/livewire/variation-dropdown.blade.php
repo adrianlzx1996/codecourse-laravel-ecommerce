@@ -10,4 +10,8 @@
             <option value="{{ $variation->id }}">{{ $variation->title }}</option>
         @endforeach
     </x-select>
+
+    @if ($this->selectedVariationModel?->children->count())
+        <livewire:variation-dropdown :variations="$this->selectedVariationModel->children->sortBy('order')" :key="$selectedVariation" />
+    @endif
 </div>
