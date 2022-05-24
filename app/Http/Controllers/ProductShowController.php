@@ -9,6 +9,8 @@ class ProductShowController extends Controller
 {
 	public function __invoke(Product $product)
 	{
-		dd($product);
+		return view('products.show', [
+			'product' => $product,
+		]);
 	}
 }
