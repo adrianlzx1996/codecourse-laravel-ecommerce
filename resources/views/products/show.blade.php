@@ -19,7 +19,9 @@
                             </p>
                         </div>
 
-                        Product Variation Selector
+                        <div class="mt-6">
+                            <livewire:product-selector :product="$product" />
+                        </div>
                     </div>
                 </div>
             </div>
