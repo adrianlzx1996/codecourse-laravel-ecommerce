@@ -1,35 +1,42 @@
 <?php
 
-namespace App\Models;
+	namespace App\Models;
 
-use Cknow\Money\Money;
-use App\Models\Variation;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Image\Manipulations;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+	use Illuminate\Database\Eloquent\Factories\HasFactory;
+	use Illuminate\Database\Eloquent\Model;
+	use Spatie\Image\Manipulations;
+	use Spatie\MediaLibrary\HasMedia;
+	use Spatie\MediaLibrary\InteractsWithMedia;
+	use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Product extends Model implements HasMedia
-{
-	use HasFactory, InteractsWithMedia;
-
-	public function formattedPrice()
+	class Product extends Model implements HasMedia
 	{
-		return money($this->price);
-	}
+		use HasFactory, InteractsWithMedia;
 
-	public function variations()
-	{
-		return $this->hasMany(Variation::class);
-	}
+		public function formattedPrice ()
+		{
+			return money($this->price);
+		}
 
-	public function registerMediaConversions(Media $media = null): void
-	{
-		$this
-			->addMediaConversion('thumb200x200')
-			->fit(Manipulations::FIT_CROP, 200, 200)
-			->nonQueued();
+		public function variations ()
+		{
+			return $this->hasMany(Variation::class);
+		}
+
+		public function registerMediaConversions ( Media $media = null )
+		: void {
+			$this
+				->addMediaConversion('thumb200x200')
+				->fit(Manipulations::FIT_CROP, 200, 200)
+				->nonQueued()
+			;
+		}
+
+		public function registerMediaCollections ()
+		: void
+		{
+			$this->addMediaCollection('default')
+				 ->useFallbackUrl('/storage/no-product-image.png')
+			;
+		}
 	}
-}
