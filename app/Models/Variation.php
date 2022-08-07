@@ -1,50 +1,71 @@
 <?php
 
-namespace App\Models;
+	namespace App\Models;
 
-use App\Models\Product;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
+	use Illuminate\Database\Eloquent\Factories\HasFactory;
+	use Illuminate\Database\Eloquent\Model;
+	use Spatie\Image\Manipulations;
+	use Spatie\MediaLibrary\HasMedia;
+	use Spatie\MediaLibrary\InteractsWithMedia;
+	use Spatie\MediaLibrary\MediaCollections\Models\Media;
+	use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
-class Variation extends Model
-{
-	use HasFactory;
-	use HasRecursiveRelationships;
-
-
-	public function formattedPrice()
+	class Variation extends Model implements HasMedia
 	{
-		return money($this->price);
-	}
+		use HasFactory;
+		use HasRecursiveRelationships;
+		use InteractsWithMedia;
 
-	public function product()
-	{
-		return $this->belongsTo(Product::class);
-	}
 
-	public function stocks ()
-	{
-		return $this->hasMany(Stock::class);
-	}
+		public function formattedPrice ()
+		{
+			return money($this->price);
+		}
 
-	public function stockCount ()
-	{
-		return $this->descendantsAndSelf->sum(fn($variation) => $variation->stocks->sum('quantity'));
-	}
+		public function product ()
+		{
+			return $this->belongsTo(Product::class);
+		}
 
-	public function inStock ()
-	{
-		return $this->stockCount() > 0;
-	}
+		public function stocks ()
+		{
+			return $this->hasMany(Stock::class);
+		}
 
-	public function outOfStock ()
-	{
-		return !$this->inStock();
-	}
+		public function lowStock ()
+		{
+			return !$this->outOfStock() && $this->stockCount() <= 5;
+		}
 
-	public function lowStock ()
-	{
-		return !$this->outOfStock() && $this->stockCount() <= 5;
+		public function outOfStock ()
+		{
+			return !$this->inStock();
+		}
+
+		public function inStock ()
+		{
+			return $this->stockCount() > 0;
+		}
+
+		public function stockCount ()
+		{
+			return $this->descendantsAndSelf->sum(fn ( $variation ) => $variation->stocks->sum('quantity'));
+		}
+
+		public function registerMediaConversions ( Media $media = null )
+		: void {
+			$this
+				->addMediaConversion('thumb200x200')
+				->fit(Manipulations::FIT_CROP, 200, 200)
+				->nonQueued()
+			;
+		}
+
+		public function registerMediaCollections ()
+		: void
+		{
+			$this->addMediaCollection('default')
+				 ->useFallbackUrl('/storage/no-product-image.png')
+			;
+		}
 	}
-}
