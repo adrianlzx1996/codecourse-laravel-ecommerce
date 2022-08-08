@@ -9,6 +9,8 @@
 
 	class Cart implements CartInterface
 	{
+		protected $instance;
+
 		public function __construct ( protected SessionManager $session ) {}
 
 		public function exists ()
@@ -41,6 +43,10 @@
 
 		protected function instance ()
 		{
-			return ModelsCart::whereUuid($this->session->get(config('cart.session.key')))->first();
+			if ( $this->instance ) {
+				return $this->instance;
+			}
+			
+			return $this->instance = ModelsCart::whereUuid($this->session->get(config('cart.session.key')))->first();
 		}
 	}
