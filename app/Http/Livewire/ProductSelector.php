@@ -1,41 +1,46 @@
 <?php
 
-namespace App\Http\Livewire;
+	namespace App\Http\Livewire;
 
-use Livewire\Component;
-use App\Models\Variation;
+	use App\Cart\Contracts\CartInterface;
+	use App\Models\Variation;
+	use Livewire\Component;
 
-class ProductSelector extends Component
-{
-	public $product;
-	public $initialVariation;
-	public $skuVariant;
-
-	protected $listeners = [
-		'skuVariantSelected'
-	];
-
-	public function mount()
+	class ProductSelector extends Component
 	{
-		$this->initialVariation = $this->product->variations->sortBy('order')->groupBy('type')->first();
-	}
+		public $product;
+		public $initialVariation;
+		public $skuVariant;
 
-	public function skuVariantSelected($variantId)
-	{
-		if (!$variantId) {
-			$this->skuVariant = null;
-			return;
+		protected $listeners
+			= [
+				'skuVariantSelected',
+			];
+
+		public function mount ()
+		{
+			$this->initialVariation = $this->product->variations->sortBy('order')->groupBy('type')->first();
 		}
 
-		$this->skuVariant = Variation::find($variantId);
-	}
+		public function skuVariantSelected ( $variantId )
+		{
+			if ( !$variantId ) {
+				$this->skuVariant = null;
+				return;
+			}
 
-	public function render()
-	{
-		return view('livewire.product-selector');
-	}
+			$this->skuVariant = Variation::find($variantId);
+		}
 
-	public function addToCart() {
-		
+		public function render ()
+		{
+			return view('livewire.product-selector');
+		}
+
+		public function addToCart ( CartInterface $cart )
+		{
+			$cart->add($this->skuVariant, 1);
+
+			$this->emit('cart.updated');
+		}
 	}
-}
