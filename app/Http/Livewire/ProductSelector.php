@@ -42,5 +42,10 @@
 			$cart->add($this->skuVariant, 1);
 
 			$this->emit('cart.updated');
+
+			$this->dispatchBrowserEvent('notification', [
+				'text'    => 'Product added to cart',
+				'timeout' => 4000,
+			]);
 		}
 	}
